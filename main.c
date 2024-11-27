@@ -8,7 +8,6 @@ int main(){
   pid_t p1;
   pid_t p2;
   p1 = fork();
-  // p2 = fork();
   srand(getpid());
   if (p1<0){
     perror("fork failed\n");
@@ -19,13 +18,8 @@ int main(){
     printf("%d %dsec\n", getpid(), s);
     sleep(s);
     printf("%d finished after %d seconds.\n", getpid(), s);
+    exit(s);
   }
-  // else if (!p2){
-  //   int s = rand()%5+1;
-  //   printf("%d %dsec\n", getpid(), s);
-  //   sleep(s);
-  //   printf("%d finished after %d seconds.\n", getpid(), s);
-  // }
   else{
     p2 = fork();
     if (p2<0){
@@ -37,13 +31,19 @@ int main(){
       printf("%d %dsec\n", getpid(), s);
       sleep(s);
       printf("%d finished after %d seconds.\n", getpid(), s);
+      exit(s);
     }
     else{
       int status;
       pid_t child= wait(&status);
+      if (child == -1) {
+        perror("wait failed\n");
+        exit(1);
+      }
       if (WIFEXITED(status)){
-        printf("Main Process %d is done. Child %d slept for ___ sec\n", getpid(), child);
+        printf("Main Process %d is done. Child %d slept for %d sec\n", getpid(), child, WEXITSTATUS(status));
       }
     }
   }
+  return 0;
 }
